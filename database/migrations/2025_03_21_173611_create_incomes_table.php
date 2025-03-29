@@ -12,9 +12,13 @@ return new class extends Migration {
     {
         Schema::create('incomes', function (Blueprint $table) {
             $table->id();
-            $table->string('income');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('source');
+            $table->string('description');
             $table->decimal('amount');
+            $table->string('currency')->nullable()->default('USD');
             $table->enum('status', ['Pending', 'Paid']);
+            $table->boolean('tax_deducted')->default(false);
             $table->date('date');
             $table->timestamps();
         });

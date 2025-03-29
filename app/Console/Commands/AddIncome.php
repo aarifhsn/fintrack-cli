@@ -12,7 +12,7 @@ class AddIncome extends Command
      *
      * @var string
      */
-    protected $signature = 'fintrack:add-income';
+    protected $signature = 'fintrack:add-income {--user= : User ID} {--date= : Optional date (YYYY-MM-DD)}';
 
     /**
      * The console command description.
@@ -26,14 +26,23 @@ class AddIncome extends Command
      */
     public function handle()
     {
-        $source = $this->ask('Enter income source (Upwork, Fiverr, Direct Client)');
+        $userID = $this->option('user') ?? $this->ask('Enter user ID');
+        $date = $this->option('date') ?? now();
+        $category = $this->choice('Select income category', ['Upwork', 'Fiverr', 'Direct Client', 'Retainer', 'Projects', 'Others']);
+        $description = $this->ask('Enter description (optional)');
+        $currency = $this->choice('Select currency', ['USD', 'EUR', 'GBP', 'BDT', 'AUD']);
         $amount = $this->ask('Enter amount');
-        $status = $this->choice('Select payment status', ['Pending', 'Paid'], 1);
+        $status = $this->choice('Select payment status', ['Pending', 'Processing', 'Paid', 'Failed'], 1);
+        $taxDeducted = $this->confirm('Tax already deducted?', false);
 
         Income::create([
-            'income' => $source,
+            'user_id' => $userID,
+            'source' => $category,
+            'description' => $description,
             'amount' => $amount,
+            'currency' => $currency,
             'status' => $status,
+            'tax_deducted' => $taxDeducted,
             'date' => now(),
         ]);
         $this->info('Income entry added successfully!');

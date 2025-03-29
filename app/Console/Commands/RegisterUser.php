@@ -13,7 +13,7 @@ class RegisterUser extends Command
      *
      * @var string
      */
-    protected $signature = 'user:register';
+    protected $signature = 'fintrack:user-register';
 
     /**
      * The console command description.
