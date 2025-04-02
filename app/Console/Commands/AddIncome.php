@@ -26,7 +26,7 @@ class AddIncome extends Command
      */
     public function handle()
     {
-        $userID = $this->option('user') ?? $this->ask('Enter user ID');
+        $userID = $this->option('user') ?? $this->ask('Enter user ID. First Register User if not exist and check ID from database.');
         $date = $this->option('date') ?? now();
         $category = $this->choice('Select income category', ['Upwork', 'Fiverr', 'Direct Client', 'Retainer', 'Projects', 'Others']);
         $description = $this->ask('Enter description (optional)');

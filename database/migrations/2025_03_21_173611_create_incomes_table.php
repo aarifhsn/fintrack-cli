@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('source');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->decimal('amount');
             $table->string('currency')->nullable()->default('USD');
             $table->enum('status', ['Pending', 'Paid']);
