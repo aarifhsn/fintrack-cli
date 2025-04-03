@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Expense;
+use Illuminate\Support\Facades\Cache;
 
 class AddExpense extends Command
 {
@@ -26,10 +27,18 @@ class AddExpense extends Command
      */
     public function handle()
     {
+        $userId = Cache::get('cli_user_id');
+
+        if (!$userId) {
+            $this->error('User ID is not set. Run `php artisan user:set` first.');
+            return;
+        }
+
         $category = $this->ask('Enter expense category');
         $amount = $this->ask('Enter amount');
 
         Expense::create([
+            'user_id' => $userId,
             'category' => $category,
             'amount' => $amount,
             'date' => now(),

@@ -18,7 +18,7 @@ class ManageClients extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Manage clients';
 
     /**
      * Execute the console command.

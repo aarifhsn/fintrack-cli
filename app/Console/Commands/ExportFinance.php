@@ -8,6 +8,7 @@ use App\Models\Income;
 use Illuminate\Console\Command;
 use SplTempFileObject;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 class ExportFinance extends Command
 {
@@ -30,14 +31,14 @@ class ExportFinance extends Command
      */
     public function handle()
     {
-        $userId = $this->option('user');
+        $userId = Cache::get('cli_user_id');
 
         if (!$userId) {
-            $this->error('Please provide a user ID using --user=<id>');
+            $this->error('User ID is not set. Run `php artisan user:set` first.');
             return;
         }
 
-        $this->info("Exporting finance data for User ID: $userId...");
+        $this->info("Exporting finance data for User ID: $userId");
 
         // Fetch data
         $incomes = Income::where('user_id', $userId)->get();
