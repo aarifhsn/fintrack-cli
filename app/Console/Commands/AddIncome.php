@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Income;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class AddIncome extends Command
 {
@@ -26,8 +27,13 @@ class AddIncome extends Command
      */
     public function handle()
     {
-        $userID = $this->option('user') ?? $this->ask('Enter user ID. First Register User if not exist and check ID from database.');
-        $date = $this->option('date') ?? now();
+        $userId = Cache::get('cli_user_id');
+
+        if (!$userId) {
+            $this->error('User ID is not set. Run `php artisan user:set` first.');
+            return;
+        }
+
         $category = $this->choice('Select income category', ['Upwork', 'Fiverr', 'Direct Client', 'Retainer', 'Projects', 'Others']);
         $description = $this->ask('Enter description (optional)');
         $currency = $this->choice('Select currency', ['USD', 'EUR', 'GBP', 'BDT', 'AUD']);
@@ -36,7 +42,7 @@ class AddIncome extends Command
         $taxDeducted = $this->confirm('Tax already deducted?', false);
 
         Income::create([
-            'user_id' => $userID,
+            'user_id' => $userId,
             'source' => $category,
             'description' => $description,
             'amount' => $amount,
