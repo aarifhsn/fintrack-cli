@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Expense;
 use App\Models\Income;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 
 class CalculateTax extends Command
 {
@@ -20,14 +21,14 @@ class CalculateTax extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Calculate tax for a user';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $userId = $this->option('user');
+        $userId = Cache::get('cli_user_id');
         $year = $this->option('year') ?? now()->year;
 
         $income = Income::where('user_id', $userId)
@@ -57,4 +58,26 @@ class CalculateTax extends Command
             [[$year, $income, $taxableExpenses, $taxableIncome, $taxOwed]]
         );
     }
+
+    /**
+     * Calculate the tax based on progressive tax brackets.
+     */
+    private function calculateTax($income, $brackets)
+    {
+        $tax = 0;
+        $previousLimit = 0;
+
+        foreach ($brackets as $bracket) {
+            if ($income > $previousLimit) {
+                $taxableAmount = min($income, $bracket['limit']) - $previousLimit;
+                $tax += $taxableAmount * $bracket['rate'];
+                $previousLimit = $bracket['limit'];
+            } else {
+                break;
+            }
+        }
+
+        return round($tax, 2);
+    }
+
 }
